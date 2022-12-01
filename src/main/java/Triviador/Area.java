@@ -2,10 +2,9 @@ package Triviador;
 
 public class Area {
     public final int areaNum;
-    private String fileName;
-    private String buttonFileName;
-    private boolean isBlue;
-
+    public final String fileName;
+    public final String buttonFileName;
+    public final boolean isBlue;
     public final boolean isKingdom;
 
     public Area(int areaNum, boolean isBlue, boolean isKingdom) {
@@ -19,29 +18,5 @@ public class Area {
             fileName="area"+areaNum+"red.png";
             buttonFileName="redArcher.png";
         }
-    }
-
-    public String getButtonFileName() {
-        return buttonFileName;
-    }
-
-    public void setButtonFileName(String buttonFileName) {
-        this.buttonFileName = buttonFileName;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public boolean isBlue() {
-        return isBlue;
-    }
-
-    public void setBlue(boolean blue) {
-        isBlue = blue;
     }
 }

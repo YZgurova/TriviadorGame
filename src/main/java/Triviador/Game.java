@@ -5,26 +5,56 @@ import java.util.List;
 
 public class Game {
     private boolean isStarted;
+    private volatile StateEnum state;
+    private List<Integer> player1Areas;
+    private List<Integer> player2Areas;
+    private Player playerOnTurn;
 
-    private State state;
-    private List<Area> player1Areas;
-    private List<Area> player2Areas;
+    private int givenAnswers=0;
 
-    public Game() {
+    public int getGivenAnswers() {
+        return givenAnswers;
+    }
+
+    public void setGivenAnswers(int givenAnswers) {
+        this.givenAnswers = givenAnswers;
+    }
+
+    private Area currentAttackedArea;
+
+    public Game(Player player) {
         isStarted=true;
-        state=State.WaitingForClient;
-        player1Areas=null;
-        player2Areas=null;
+        state= StateEnum.WaitingForClient;
+        player1Areas=new ArrayList<>();
+        player1Areas.add(1);
+        player1Areas.add(2);
+        player1Areas.add(3);
+        player1Areas.add(4);
+        player2Areas=new ArrayList<>();
+        player2Areas.add(5);
+        player2Areas.add(6);
+        player2Areas.add(7);
+        player2Areas.add(8);
+        playerOnTurn=player;
+        currentAttackedArea =null;
     }
 
-    public Game(boolean isStarted,State state, List<Area> player1Areas, List<Area> player2Areas) {
-        this.state = state;
-        player1Areas=new ArrayList<>();
-        this.player1Areas = player1Areas;
-        player2Areas=new ArrayList<>();
-        this.player2Areas = player2Areas;
-        this.isStarted=isStarted;
+    public Area getCurrentAttackedArea() {
+        return currentAttackedArea;
     }
+
+    public void setCurrentAttackedArea(Area currentAttackedArea) {
+        this.currentAttackedArea = currentAttackedArea;
+    }
+
+    public Player getPlayerOnTurn() {
+        return playerOnTurn;
+    }
+
+    public void setPlayerOnTurn(Player playerOnTurn) {
+        this.playerOnTurn = playerOnTurn;
+    }
+
     public boolean isStarted() {
         return isStarted;
     }
@@ -33,27 +63,20 @@ public class Game {
         isStarted = started;
     }
 
-    public State getState() {
+    public StateEnum getState() {
         return state;
     }
 
-    public void setState(State state) {
+    public void setState(StateEnum state) {
         this.state = state;
     }
 
-    public List<Area> getPlayer1Areas() {
+    public List<Integer> getPlayer1Areas() {
         return player1Areas;
     }
 
-    public void setPlayer1Areas(List<Area> player1Areas) {
-        this.player1Areas = player1Areas;
-    }
-
-    public List<Area> getPlayer2Areas() {
+    public List<Integer> getPlayer2Areas() {
         return player2Areas;
     }
 
-    public void setPlayer2Areas(List<Area> player2Areas) {
-        this.player2Areas = player2Areas;
-    }
 }

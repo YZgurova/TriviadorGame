@@ -1,13 +1,13 @@
-package Triviador;
+package Triviador.QuestionFrameClasses;
 
 public class Question {
-    int ID;
-    String text;
-    String answer;
+    public final int ID;
+    public final String text;
+    public final String answer;
 
-    String firstWrongAnswer;
-    String secondWrongAnswer;
-    String trhirdWrongAnswer;
+    public final String firstWrongAnswer;
+    public final String secondWrongAnswer;
+    public final String trhirdWrongAnswer;
 
     public Question(int ID, String text, String answer,String firstWrongAnswer,String secondWrongAnswer, String trhirdWrongAnswer) {
         super();

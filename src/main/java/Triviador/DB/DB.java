@@ -1,8 +1,11 @@
-package Triviador;
+package Triviador.DB;
 
+import Triviador.Game;
+import Triviador.QuestionFrameClasses.Question;
 import com.google.gson.Gson;
 
 import java.sql.*;
+import java.util.*;
 
 public class DB {
         private Connection connection;
@@ -13,9 +16,9 @@ public class DB {
     public DB() {
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            this.connection= DriverManager.getConnection("jdbc:mysql://localhost:3306/triviador?characterEncoding=utf8", "root", "root");//Server=localhost\SQLEXPRESS;Database=master;Trusted_Connection=True;
-            this.statement=connection.createStatement();
-            this.createTables();
+            connection= DriverManager.getConnection("jdbc:mysql://localhost:3306/triviador?characterEncoding=utf8", "root", "root");//Server=localhost\SQLEXPRESS;Database=master;Trusted_Connection=True;
+            statement=connection.createStatement();
+            createTables();
         } catch(Exception e) {
             System.out.println("Problem with DB setup!" + e);
         } //tova e v try catch blok poneje bazata moje da ni varne exception
@@ -24,8 +27,8 @@ public class DB {
     public String getJSONFromDB() {
         try {
             String query="SELECT `data` from `tbl_game_statement` order by last_update ASC LIMIT 1";
-            this.resultSet=statement.executeQuery(query);
-            while(this.resultSet.next()) {
+            resultSet=statement.executeQuery(query);
+            while(resultSet.next()) {
                 return resultSet.getString("data");
             }
         } catch (Exception e) {
@@ -33,12 +36,27 @@ public class DB {
         }
         return null;
     }
+
+    public void addFirstData(Game game) {
+        String jo=new Gson().toJson(game);
+        String query = "INSERT INTO `tbl_game_statement` (id, data, last_update) VALUES (1, ?, CURRENT_TIMESTAMP) ";
+        try {
+            preparedStatement=connection.prepareStatement(query);
+            preparedStatement.setString(1, jo);
+            preparedStatement.executeUpdate();
+        } catch (Exception e) {
+            System.out.println("Problems with adding updated data "+e);
+            System.out.println(query);
+        }
+    }
     public void addUpdatedData(Game game) {
         String jo=new Gson().toJson(game);
-        String query = "INSERT INTO `tbl_game_statement` (data, last_update) VALUES (?, CURRENT_TIMESTAMP)";
+//        String query = "INSERT INTO `tbl_game_statement` (id, data, last_update) VALUES (1, ?, CURRENT_TIMESTAMP) " +
+//                "ON DUPLICATE KEY UPDATE data=?, last_update=CURRENT_TIMESTAMP";
+        String query = "UPDATE `tbl_game_statement` SET id = 1 ,data = ?, last_update=CURRENT_TIMESTAMP";
         try {
-            preparedStatement=this.connection.prepareStatement(query);
-            this.preparedStatement.setString(1, jo);
+            preparedStatement=connection.prepareStatement(query);
+            preparedStatement.setString(1, jo);
             preparedStatement.executeUpdate();
         } catch (Exception e) {
             System.out.println("Problems with adding updated data "+e);
@@ -49,7 +67,7 @@ public class DB {
     public int getTotalTries (int questionID) {
         String query="SELECT COUNT(1) FROM tbl_answer_try where question_id="+questionID;
         try {
-            int count = this.resultSet.getInt("count");
+            int count = resultSet.getInt("count");
             return count;
         } catch (Exception e) {
             System.out.println("Problems with getTotalTries "+e);
@@ -60,8 +78,7 @@ public class DB {
 
 
     public void addAnswerTry(String answerTry, int questionID,boolean isCorrect, String playerName) {
-        String query = "INSERT INTO tbl_answer_try(question_id, player, `text`, `ìs_correct`, `ìs_winner`, answer_time) \n" +
-                "VALUES (?,?,?,?, ((SELECT COUNT(1) FROM tbl_answer_try tb WHERE id=? and ìs_correct=1) = 0 AND ? = 1),CURRENT_TIMESTAMP)";
+        String query = "INSERT INTO tbl_answer_try(question_id, player, `text`, `ìs_correct`, `ìs_winner`, answer_time) VALUES (?,?,?,?, ((SELECT count(1) FROM tbl_answer_try tb WHERE id=? and ìs_correct=1) = 0 AND ? = 1),CURRENT_TIMESTAMP)";
         try {
             this.preparedStatement = this.connection.prepareStatement(query);
             this.preparedStatement.setInt(1, questionID);
@@ -82,7 +99,7 @@ public class DB {
 
     private void checkWinner(int questionID) {
         try {
-            String player=this.getQuestionWinner(questionID);
+            String player=getQuestionWinner(questionID);
             if(player==null) {
                 return;
             }
@@ -105,30 +122,47 @@ public class DB {
     }
     public String getQuestionWinner(int questionID) {
         try {
-            String query="SELECT player from tbl_answer_try WHERE question_id="+questionID+" AND `ìs_correct`=1 ORDER BY answer_time ASC LIMIT 1";
+            String query="SELECT player from tbl_answer_try WHERE question_id="+questionID+" ORDER BY answer_time ASC;";
             this.resultSet=statement.executeQuery(query);
             while(this.resultSet.next()) {
                 return resultSet.getString("player");
             }
         } catch (Exception e) {
-            System.out.println("Problem with getQuestionQinner "+e);
+            System.out.println("Problem with getQuestionWinner "+e);
         }
         return null;
     }
 
-    public Question getActiveQuestion() {
-        String query ="SELECT * FROM tbl_question WHERE `ìs_answered`=0 ORDER BY id ASC LIMIT 1";
+    public boolean getQuestionAnswers(int questionID, List<Map.Entry<String,Boolean>> list) {
         try {
+            String query="SELECT player, `ìs_correct` from tbl_answer_try WHERE question_id="+questionID+" ORDER BY answer_time ASC;";
+            statement= connection.createStatement();
             resultSet=statement.executeQuery(query);
-            while (resultSet.next()) { //rabotata na tozi while e da tyrsi w tablicata dokato nameri neotgoworen vypros kojto da podade
+            while(resultSet.next()) {
+                String name = resultSet.getString("player");
+                Boolean res = resultSet.getBoolean("is_correct");
+                list.add(new AbstractMap.SimpleEntry<>(name,res));
+            }
+            return true;
+        } catch (Exception e) {
+            System.out.println("Problem with getQuestionQinner "+e);
+        }
+        return false;
+    }
+
+    public Question getActiveQuestion() {
+        try {
+            String query ="SELECT * FROM tbl_question WHERE `ìs_answered`=0 ORDER BY id ASC LIMIT 1";
+            statement= connection.createStatement();
+            resultSet=statement.executeQuery(query);
+            while (resultSet.next()) {
                 int ID=resultSet.getInt("ID");
                 String text=resultSet.getString("question");
                 String answer=resultSet.getString("answer");
                 String firstWrongAnswer=resultSet.getString("first_wrong_answer");
                 String secondWrongAnswer=resultSet.getString("second_wrong_answer");
                 String thirdWrongAnswer=resultSet.getString("third_wrong_answer");
-                Question question = new Question(ID, text, answer,firstWrongAnswer,secondWrongAnswer,thirdWrongAnswer);
-                return question;
+                return new Question(ID, text, answer,firstWrongAnswer,secondWrongAnswer,thirdWrongAnswer);
             }
         } catch (Exception e) {
             System.out.println("Problems with getActiveQuestion " +e);
@@ -168,9 +202,9 @@ public class DB {
                 PRIMARY KEY (`id`))
                 COLLATE='utf8mb4_general_ci'
                 ENGINE=InnoDB;""";
-        this.insert(createQuestionTable);
-        this.insert(createAnswerTable);
-        this.insert(createGameStateTable);
+        insert(createQuestionTable);
+        insert(createAnswerTable);
+        insert(createGameStateTable);
 
     }
 
