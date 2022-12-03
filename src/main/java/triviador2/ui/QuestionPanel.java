@@ -71,13 +71,17 @@ public class QuestionPanel {
                     Game.atomicStateUpdate(() -> Game.state.player2Territories.add(Game.state.attackedArea));
                     Game.atomicStateUpdate(() -> Game.state.player1Territories.remove(Integer.valueOf(Game.state.attackedArea)));
                 }
-                Game.state.player1Answer=null;
-                Game.state.player2Answer=null;
-                GameState currentState=Game.state.gameState;
-                Game.state.playerOnTurn=GameState.getNextState(currentState);
-                Game.atomicStateUpdate(() -> Game.state.gameState = GameState.getNextState(currentState));
-                System.out.println(Game.state.gameState);
+                if(Game.state.player1Territories.size()==0 || Game.state.player2Territories.size()==0) {
+                    Game.atomicStateUpdate(() -> Game.state.gameState=GameState.GAME_END);
+                } else {
+                    Game.state.player1Answer = null;
+                    Game.state.player2Answer = null;
+                    GameState currentState = Game.state.gameState;
 
+                    Game.state.playerOnTurn = GameState.getNextState(currentState);
+                    Game.atomicStateUpdate(() -> Game.state.gameState = GameState.getNextState(currentState));
+                    Game.atomicStateUpdate(() -> Game.state.playerOnTurn=GameState.getNextState(Game.state.gameState));
+                }
             }
             if(e.getSource()!=answerButtons.get(4)) {
                 String finalGivenAnswer = givenAnswer;

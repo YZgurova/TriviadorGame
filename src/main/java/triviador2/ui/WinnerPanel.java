@@ -34,14 +34,14 @@ public class WinnerPanel {
                     if(Game.state.player1Territories.size()==0) {
                         text.setText("Sorry, you lose thise game :(");
                     } else {
-                        // ImageIcon image = new ImageIcon("crown.png");
+                        ImageIcon image = new ImageIcon("crown.jpg");
                         text.setText("Congratulation, you are winner");
                     }
                 }else {
                     if(Game.state.player2Territories.size()==0) {
                         text.setText("Sorry, you lose thise game :(");
                     } else {
-                        // ImageIcon image = new ImageIcon("crown.png");
+                        ImageIcon image = new ImageIcon("crown.jpg");
                         text.setText("Congratulation, you are winner");
                     }
                 }

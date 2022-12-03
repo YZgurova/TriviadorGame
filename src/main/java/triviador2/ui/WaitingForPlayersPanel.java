@@ -12,13 +12,6 @@ import java.awt.event.WindowListener;
 public class WaitingForPlayersPanel {
     public static JFrame frame;
 
-//    public WaitingPanel() {
-//        MainLogic.mainFrame.repaint();
-//        MainLogic.mainFrame.getContentPane().removeAll();
-//        MainLogic.mainFrame.setContentPane(init());
-//        //MainLogic.mainFrame.getContentPane().add(init());
-//    }
-
     public static void init() {
         frame = new JFrame();
         JPanel panel = (JPanel)frame.getContentPane();

@@ -39,7 +39,6 @@ public class Questions {
             questionNum=(int)(Math.random()*10);
         }
         givenQuestions.add(questionNum);
-        System.out.println(questionNum);
         return questionNum;
 
     }

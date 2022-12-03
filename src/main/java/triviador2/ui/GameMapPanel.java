@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameMapPanel {
-    private static List<JLabel> areaLabels = new ArrayList<>();
+    private static final List<JLabel> areaLabels = new ArrayList<>();
 
-    private static List<JButton> areaButtons = new ArrayList<>();
+    private static final List<JButton> areaButtons = new ArrayList<>();
     private static JLabel hello;
 
     public static JFrame frame;
@@ -67,17 +67,18 @@ public class GameMapPanel {
         if(Game.state.player1Territories.size()==0 || Game.state.player2Territories.size()==0) {
             Game.atomicStateUpdate(() -> Game.state.gameState=GameState.GAME_END);
         }
+        //ClickAction();
         updateGUI();
     }
 
     public static void updateGUI() {
         if (Game.state.gameState == GameState.PLAYER1_TURN || Game.state.gameState == GameState.PLAYER2_TURN) {
             if (!frame.isVisible()) {
+                frame.setVisible(true);
                 if(Game.state.gameState.equals(Game.thisPlayerState)) {
                     Game.atomicStateUpdate(() -> Game.state.currentQuestion = Questions.generateRandomQuestion());
                     ClickAction();
                 }
-                frame.setVisible(true);
             }
 
             for (int i = 0; i < 8; i++) {
@@ -127,7 +128,7 @@ public class GameMapPanel {
             };
             Questions.generateRandomQuestion();
             GameState currentState = Game.state.gameState;
-            Game.atomicStateUpdate(() -> Game.state.gameState = currentState.getNextState(currentState));
+            Game.atomicStateUpdate(() -> Game.state.gameState = GameState.getNextState(currentState));
             int finalAttckedArea = attckedArea;
             Game.atomicStateUpdate(() -> Game.state.attackedArea= finalAttckedArea);
         }

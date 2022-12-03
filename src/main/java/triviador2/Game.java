@@ -22,6 +22,7 @@ public class Game {
 
         public State() {
             this.gameState = GameState.WAITING_FOR_PLAYERS;
+            this.playerOnTurn=GameState.PLAYER1_TURN;
             player1 = "none";
             player2 = "none";
             this.player1Territories = new ArrayList<>();
@@ -62,7 +63,7 @@ public class Game {
                 state.gameState = GameState.PLAYER1_TURN;
                 thisPlayerState = GameState.PLAYER2_TURN;
                 state.player2=thisPlayerUsername;
-                state.playerOnTurn=GameState.PLAYER1_TURN;
+                //Game.atomicStateUpdate(() -> state.playerOnTurn=GameState.PLAYER1_TURN);
             }
         });
     }
