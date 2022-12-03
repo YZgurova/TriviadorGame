@@ -1,4 +1,4 @@
-package Triviador;
+package triviador2;
 
 public class Area {
     public final int areaNum;
