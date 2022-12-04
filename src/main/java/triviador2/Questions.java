@@ -4,17 +4,17 @@ import java.util.*;
 
 public class Questions {
     public static final List<String> questions = new ArrayList<>(Arrays.asList(
-            "You're 4th place right now in a race.\n What place will you be in when\n you pass the person in 3rd place?",
-            "How many months have 28 days?",
-            "How many 0.5cm slices \ncan you cut from \na bread that is 25cm long?",
-            "At a length of 4,132 miles, " + "\nwhat is the longest river in the world?",
-            "What is the tallest mountain in the world?",
-            "Which of the following was \nAustralia's first national park?",
-            "When did Chicago first start dying their river green for St Paddy’s Day?",
-            "When were fireworks first officially used in a celebration for 4th July?",
-            "Who directed Fahrenheit 911?'",
-            "Which nation has won the most World Cups?",
-            "Who painted The Last Supper over a three-year period between 1495 to 1498?"
+            "<html>You're 4th place right now in a race. <br>What place will you be in when <br>you pass the person in 3rd place?</html>",
+            "<html>How many months have 28 days?</html>",
+            "<html>How many 0.5cm slices can you cut <br>from a bread that is 25cm long?</html>",
+            "<html>At a length of 4,132 miles, <br>what is the longest river in the world?</html>",
+            "<html>What is the tallest mountain in the world?</html>",
+            "<html>Which of the following was <br>Australia's first national park?</html>",
+            "<html>When did Chicago first start dying <br>their river green for St Paddy’s Day?</html>",
+            "<html>When were fireworks first officially <br>used in a celebration for 4th July?</html>",
+            "<html>Who directed Fahrenheit 911?</html>",
+            "<html>Which nation has won the most World Cups?</html>",
+            "<html>Who painted The Last Supper over <br>a three-year period <br>between 1495 to 1498?</html>"
     ));
 
     public static final HashMap<Integer, List<String>> answers = new HashMap<>() {{
@@ -31,14 +31,13 @@ public class Questions {
         put(10,Arrays.asList("Leonardo da Vinci","Michaelangelo","Vincent Van Gogh","Leonardo da Vinci","Botticelli"));
     }};
 
-    private static List<Integer> givenQuestions=new ArrayList<>();
-
     public static Integer generateRandomQuestion() {
         int questionNum = (int)(Math.random()*10);
-        while(givenQuestions.contains(questionNum)) {
+        while(Game.state.listOfGivenQuestions.contains(questionNum)) {
             questionNum=(int)(Math.random()*10);
         }
-        givenQuestions.add(questionNum);
+        int finalQuestionNum = questionNum;
+        Game.atomicStateUpdate(() -> Game.state.listOfGivenQuestions.add(finalQuestionNum));
         return questionNum;
 
     }

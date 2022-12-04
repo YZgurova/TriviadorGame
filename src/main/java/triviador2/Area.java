@@ -5,11 +5,9 @@ public class Area {
     public final String fileName;
     public final String buttonFileName;
     public final boolean isBlue;
-    public final boolean isKingdom;
 
-    public Area(int areaNum, boolean isBlue, boolean isKingdom) {
+    public Area(int areaNum, boolean isBlue) {
         this.isBlue = isBlue;
-        this.isKingdom=isKingdom;
         this.areaNum=areaNum;
         if(isBlue) {
             fileName="area"+areaNum+"blue.png";

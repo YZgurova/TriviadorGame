@@ -17,7 +17,8 @@ public class GameMapPanel {
 
     private static final List<JButton> areaButtons = new ArrayList<>();
     private static JLabel hello;
-
+    private static JLabel statusLabel;
+    public static JLabel resultFromAttackLabel;
     public static JFrame frame;
     public static final List<Area> areaCollection = new ArrayList<>();
 
@@ -29,12 +30,29 @@ public class GameMapPanel {
         panel.setLayout(null);
 
         hello = new JLabel();
-       // hello.setText(String.valueOf(Game.state.playerOnTurn));
-        hello.setText(String.format("Hi, %s whelcome to Triviador", Game.thisPlayerUsername));
+        if(Game.thisPlayerState.equals(GameState.PLAYER1_TURN)) {
+            hello.setText(String.format("TriviadorGame: %s. Your territories are in blue", Game.thisPlayerUsername));
+        } else {
+            hello.setText(String.format("TriviadorGame: %s. Your territories are in red", Game.thisPlayerUsername));
+        }
+
         hello.setForeground(Color.white);
         hello.setFont(Fonts.titleFont);
-        hello.setBounds(200, 10, 500, 100);
+        hello.setBounds(200, 20, 500, 40);
         panel.add(hello);
+
+        resultFromAttackLabel=new JLabel();
+        resultFromAttackLabel.setForeground(Color.white);
+        resultFromAttackLabel.setFont(Fonts.gameStatusFont);
+        resultFromAttackLabel.setBounds(200, 50, 500, 20);
+        panel.add(resultFromAttackLabel);
+
+        statusLabel=new JLabel();
+        statusLabel.setText(Game.state.leftCountQuestions + " : " + Game.state.playerOnTurn + "'s turn");
+        statusLabel.setForeground(Color.white);
+        statusLabel.setFont(Fonts.gameStatusFont);
+        statusLabel.setBounds(50, 450, 600,60);
+        panel.add(statusLabel);
 
         generateAreaCollection();
         areaButtons.add(createButton(panel, areaCollection.get(0).buttonFileName, 250, 190, 20, 50));
@@ -64,10 +82,12 @@ public class GameMapPanel {
         frame.setContentPane(panel);
         frame.setBounds(50, 50, GameUI.width, GameUI.height);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        if(Game.state.player1Territories.size()==0 || Game.state.player2Territories.size()==0) {
+
+        if(Game.state.player1Territories.size()==0 || Game.state.player2Territories.size()==0 || Game.state.leftCountQuestions==0) {
             Game.atomicStateUpdate(() -> Game.state.gameState=GameState.GAME_END);
         }
-        //ClickAction();
+
+        ClickAction();
         updateGUI();
     }
 
@@ -75,9 +95,14 @@ public class GameMapPanel {
         if (Game.state.gameState == GameState.PLAYER1_TURN || Game.state.gameState == GameState.PLAYER2_TURN) {
             if (!frame.isVisible()) {
                 frame.setVisible(true);
-                if(Game.state.gameState.equals(Game.thisPlayerState)) {
+                if(Game.state.playerOnTurn.equals(GameState.PLAYER1_TURN)) {
+                    statusLabel.setText(Game.state.leftCountQuestions + " : " + Game.state.player1);
+                } else {
+                    statusLabel.setText(Game.state.leftCountQuestions + " : " + Game.state.player2);
+                }
+                if(Game.thisPlayerState.equals(Game.state.playerOnTurn)) {
                     Game.atomicStateUpdate(() -> Game.state.currentQuestion = Questions.generateRandomQuestion());
-                    ClickAction();
+                    //ClickAction();
                 }
             }
 
@@ -110,27 +135,28 @@ public class GameMapPanel {
     private static class ClickAction implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            int attckedArea = 0;
-            if (e.getSource() == areaButtons.get(1)) {
-                attckedArea=1;
-            } else if (e.getSource() == areaButtons.get(2)) {
-                attckedArea=2;
-            } else if (e.getSource() == areaButtons.get(3)) {
-                attckedArea=3;
-            } else if (e.getSource() == areaButtons.get(4)) {
-                attckedArea=4;
-            } else if (e.getSource() == areaButtons.get(5)) {
-                attckedArea=5;
-            } else if (e.getSource() == areaButtons.get(6)) {
-                attckedArea=6;
-            } else if (e.getSource() == areaButtons.get(7)) {
-                attckedArea=7;
-            };
-            Questions.generateRandomQuestion();
-            GameState currentState = Game.state.gameState;
-            Game.atomicStateUpdate(() -> Game.state.gameState = GameState.getNextState(currentState));
-            int finalAttckedArea = attckedArea;
-            Game.atomicStateUpdate(() -> Game.state.attackedArea= finalAttckedArea);
+            if(Game.thisPlayerState.equals(Game.state.playerOnTurn)) {
+                int attckedArea = 0;
+                if (e.getSource() == areaButtons.get(1)) {
+                    attckedArea = 1;
+                } else if (e.getSource() == areaButtons.get(2)) {
+                    attckedArea = 2;
+                } else if (e.getSource() == areaButtons.get(3)) {
+                    attckedArea = 3;
+                } else if (e.getSource() == areaButtons.get(4)) {
+                    attckedArea = 4;
+                } else if (e.getSource() == areaButtons.get(5)) {
+                    attckedArea = 5;
+                } else if (e.getSource() == areaButtons.get(6)) {
+                    attckedArea = 6;
+                } else if (e.getSource() == areaButtons.get(7)) {
+                    attckedArea = 7;
+                }
+                GameState currentState = Game.state.gameState;
+                Game.atomicStateUpdate(() -> Game.state.gameState = GameState.getNextState(currentState));
+                int finalAttckedArea = attckedArea;
+                Game.atomicStateUpdate(() -> Game.state.attackedArea = finalAttckedArea);
+            }
         }
     }
 
@@ -156,7 +182,7 @@ public class GameMapPanel {
             if(Game.state.player2Territories.contains(Integer.valueOf(i))) {
                 isBlue=false;
             }
-            areaCollection.add(new Area(i, isBlue, false));
+            areaCollection.add(new Area(i, isBlue));
         }
     }
 }

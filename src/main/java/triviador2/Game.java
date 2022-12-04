@@ -13,6 +13,8 @@ public class Game {
         public String player2;
 
         public Integer currentQuestion=0;
+        public Integer leftCountQuestions;
+        public List<Integer> listOfGivenQuestions;
         public String player1Answer;
         public String player2Answer;
 
@@ -23,6 +25,8 @@ public class Game {
         public State() {
             this.gameState = GameState.WAITING_FOR_PLAYERS;
             this.playerOnTurn=GameState.PLAYER1_TURN;
+            this.leftCountQuestions=13;
+            this.listOfGivenQuestions=new ArrayList<>();
             player1 = "none";
             player2 = "none";
             this.player1Territories = new ArrayList<>();

@@ -31,14 +31,14 @@ public class WinnerPanel {
         if (Game.state.gameState == GameState.GAME_END) {
             if (!frame.isVisible()) {
                 if(Game.thisPlayerState.equals(GameState.PLAYER1_TURN)) {
-                    if(Game.state.player1Territories.size()==0) {
+                    if(Game.state.player1Territories.size()==0 || Game.state.player1Territories.size()<=Game.state.player2Territories.size()) {
                         text.setText("Sorry, you lose thise game :(");
                     } else {
                         ImageIcon image = new ImageIcon("crown.jpg");
                         text.setText("Congratulation, you are winner");
                     }
                 }else {
-                    if(Game.state.player2Territories.size()==0) {
+                    if(Game.state.player2Territories.size()==0 || Game.state.player2Territories.size()<=Game.state.player1Territories.size()) {
                         text.setText("Sorry, you lose thise game :(");
                     } else {
                         ImageIcon image = new ImageIcon("crown.jpg");

@@ -19,12 +19,18 @@ public class QuestionPanel {
 
     public static void init() {
         frame=new JFrame();
+        if(Game.thisPlayerState.equals(GameState.PLAYER1_TURN)) {
+            frame.setName(Game.state.player1);
+        } else {
+            frame.setName(Game.state.player2);
+        }
+
         JPanel panel = (JPanel) frame.getContentPane();
         panel.setBackground(Color.decode("#303330"));
 
         panel.setLayout(null);
 
-        questionLabel = createLabel(panel, Questions.questions.get(Game.state.currentQuestion), Fonts.titleFont, Color.white, 200, 80, 600, 200);
+        questionLabel = createLabel(panel, Questions.questions.get(Game.state.currentQuestion), Fonts.titleFont, Color.white, 200, 80, 900, 200);
 
         answerButtons.add(setButtonWithAnswer(panel, 200,300,180,90,Questions.answers.get(Game.state.currentQuestion).get(1)));
         answerButtons.add(setButtonWithAnswer(panel,200,400,180,90,Questions.answers.get(Game.state.currentQuestion).get(2)));
@@ -46,9 +52,8 @@ public class QuestionPanel {
         answerButtons.get(2).addActionListener(click);
         answerButtons.get(3).addActionListener(click);
         System.out.println(Game.state.playerOnTurn);
-       // if(Game.thisPlayerState.equals(Game.state.playerOnTurn)) {
-            answerButtons.get(4).addActionListener(click);
-        //}
+        answerButtons.get(4).addActionListener(click);
+
     }
 
     private static class ClickAction implements ActionListener {
@@ -63,13 +68,15 @@ public class QuestionPanel {
                 givenAnswer=answerButtons.get(2).getText();
             } else if(e.getSource()==answerButtons.get(3)) {
                 givenAnswer=answerButtons.get(3).getText();
-            } else if(Game.state.player1Answer!=null && Game.state.player2Answer!=null){
+            } else if(Game.state.player1Answer!=null && Game.state.player2Answer!=null && Game.thisPlayerState.equals(Game.state.playerOnTurn)){
                 if(Game.thisPlayerState.equals(GameState.PLAYER1_TURN) && Game.state.player1Answer.equals(Questions.answers.get(Game.state.currentQuestion).get(0)) && !Game.state.player2Answer.equals(Questions.answers.get(Game.state.currentQuestion).get(0))) {
                     Game.atomicStateUpdate(() -> Game.state.player1Territories.add(Game.state.attackedArea));
                     Game.atomicStateUpdate(() -> Game.state.player2Territories.remove(Integer.valueOf(Game.state.attackedArea)));
+                    GameMapPanel.resultFromAttackLabel.setText(Game.state.player1 + "captures the attacked territory");
                 } else if(Game.thisPlayerState.equals(GameState.PLAYER2_TURN) && Game.state.player2Answer.equals(Questions.answers.get(Game.state.currentQuestion).get(0)) && !Game.state.player1Answer.equals(Questions.answers.get(Game.state.currentQuestion).get(0))) {
                     Game.atomicStateUpdate(() -> Game.state.player2Territories.add(Game.state.attackedArea));
                     Game.atomicStateUpdate(() -> Game.state.player1Territories.remove(Integer.valueOf(Game.state.attackedArea)));
+                    GameMapPanel.resultFromAttackLabel.setText(Game.state.player2 + "captures the attacked territory");
                 }
                 if(Game.state.player1Territories.size()==0 || Game.state.player2Territories.size()==0) {
                     Game.atomicStateUpdate(() -> Game.state.gameState=GameState.GAME_END);
@@ -77,10 +84,11 @@ public class QuestionPanel {
                     Game.state.player1Answer = null;
                     Game.state.player2Answer = null;
                     GameState currentState = Game.state.gameState;
+                    GameState currNextState = GameState.getNextState(currentState);
 
-                    Game.state.playerOnTurn = GameState.getNextState(currentState);
-                    Game.atomicStateUpdate(() -> Game.state.gameState = GameState.getNextState(currentState));
-                    Game.atomicStateUpdate(() -> Game.state.playerOnTurn=GameState.getNextState(Game.state.gameState));
+                    Game.atomicStateUpdate(() -> Game.state.gameState = currNextState);
+                    Game.atomicStateUpdate(() -> Game.state.playerOnTurn=currNextState);
+                    Game.atomicStateUpdate(() -> Game.state.leftCountQuestions-=1);
                 }
             }
             if(e.getSource()!=answerButtons.get(4)) {
